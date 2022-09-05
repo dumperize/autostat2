@@ -1,24 +1,22 @@
 import re
 import jsonlines
-
 import pandas as pd
-from src.api.utils.common import str_clean
 
 from src.config import DICTIONARY_FILE_PATH, IMPORTANT_ADD_NAME_FILE_PATH, IMPORTANT_REMOVE_NAME_FILE_PATH, YEAR_REGULAR_FILE_PATH
 
 
+def str_clean(s):
+    s = re.sub(r"-", " ", s)
+    s = re.sub(r" ", "", s)
+    return s
+    
 class DataLoader(object):
-    def __new__(cls): # singleton
-        if not hasattr(cls, 'instance'):
-            print('create')
-            cls.instance = super(DataLoader, cls).__new__(cls)
-        return cls.instance
-
     def __init__(self):
         self.needUpdate = True
         self.path_to_file = DICTIONARY_FILE_PATH
 
         self._dictionary = {}
+        self._year_regular = self.get_year_regular()
 
     @property
     def dictionary(self):
@@ -54,17 +52,22 @@ class DataLoader(object):
             brand_object = {
                 "id": brand,
                 "names": generate_name(brand, " | ".join(brand_names)),
-                "models": {}
-                # "models": {
-                #     str(row["model"]): {
-                #         "id": row["model"],
-                #         "names": generate_name(row["model"], row["model_names"]),
-                #     }
-                #     for index, row in df_brand.iterrows()
-                # },
+                "models": {
+                    str(row["model"]): {
+                        "id": row["model"],
+                        "names": generate_name(row["model"], row["model_names"]),
+                    }
+                    for index, row in df_brand.iterrows()
+                },
             }
             self._dictionary[brand] = brand_object
 
+    def get_year_regular(self):
+        if self.needUpdate:
+            with open(YEAR_REGULAR_FILE_PATH) as f:
+                self._year_regular = f.readline()
+                f.close()
+        return self._year_regular
 
     def get_rules(self): 
         def generate_rule(label, name, id):
@@ -90,12 +93,9 @@ class DataLoader(object):
                 for i in model['names']:
                     name = i['name']
                     rules.extend(generate_rule("MODEL", name, f"{id}_{id_model}"))
-     
+
         # год
-        with open(YEAR_REGULAR_FILE_PATH) as f:
-            yaer_regular = f.readline()
-            rules.extend([{"label": "YEAR", "pattern": [{"TEXT": {"REGEX": yaer_regular}}]}])
-            f.close()
+        rules.extend([{"label": "YEAR", "pattern": [{"TEXT": {"REGEX": self.get_year_regular()}}]}])
         return rules
 
     def get_important_names(self): 
@@ -118,3 +118,7 @@ class DataLoader(object):
         important_names = list(filter(lambda x: x not in important_names_remove, important_names))
 
         return important_names
+
+
+
+data_loader = DataLoader() 

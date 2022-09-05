@@ -1,18 +1,16 @@
-from src.api.data_loader.DataLoader import DataLoader
-from src.models.NER.utils.add_del_span import add_span_in_doc
-from src.models.NER.utils.jaro import get_most_likely_word
-
 from spacy.tokens import Span
-from src.models.NER.utils.operation import filter_ent, find_start_string
 
-from src.models.NER.utils.retokenizer import split_token_by_n
+from src.api.data_loader.DataLoader import data_loader
+from src.NER.utils.add_del_span import add_span_in_doc
+from src.NER.utils.jaro import get_most_likely_word
+from src.NER.utils.operation import filter_ent, find_start_string
+from src.NER.utils.retokenizer import split_token_by_n
 
 
 def set_similar_brand(doc):
     max_rate = 0.0
     most_likely_brand = ''
     best_index_token = 0
-    data_loader = DataLoader()
     dictionary = data_loader.dictionary
     for index, token in enumerate(doc):
             if len(token) > 2:
@@ -28,7 +26,6 @@ def set_similar_brand(doc):
 
 def set_in_next_token(ent, doc):
     brand = ent.kb_id_ or ent.ent_id_
-    data_loader = DataLoader()
     dictionary_brand = data_loader.dictionary[brand]['models']
 
     dictionary_models = {}
@@ -70,7 +67,6 @@ def set_most_likely_model(ent, doc):
     best_index_token = 0
 
     brand = ent.kb_id_ or ent.ent_id_
-    data_loader = DataLoader()
     dictionary = data_loader.dictionary
     dictionary_brand = dictionary[brand]['models']
 

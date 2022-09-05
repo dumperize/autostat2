@@ -1,6 +1,6 @@
 import Levenshtein
 
-from src.models.NER.utils.operation import replace_rus_to_eng_char
+from src.NER.utils.operation import replace_rus_to_eng_char
 
 
 

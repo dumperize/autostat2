@@ -1,0 +1,5 @@
+pandas
+fastapi[all]
+spacy==3.2.4
+python-Levenshtein
+jsonlines

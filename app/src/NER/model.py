@@ -1,12 +1,11 @@
 import spacy
-from src.api.data_loader.DataLoader import DataLoader
+from src.api.data_loader.DataLoader import data_loader
 
-from src.models.NER.expand_model import expand_model
-from src.models.NER.add_space import CustomTokenizer
+from src.NER.expand_model import expand_model
+from src.NER.add_space import CustomTokenizer
 
 
 def create_ner_model():
-    data_loader = DataLoader()
     rules = data_loader.get_rules()
     important_names = data_loader.get_important_names()
     nlp = spacy.blank("ru")

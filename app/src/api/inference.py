@@ -1,27 +1,20 @@
 from http.client import HTTPException
 import os
 import pandas as pd
-import mlflow
-from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from os.path import dirname, abspath
-from src.models.NER.model import create_ner_model
-from src.config import DICTIONARY_FILE_PATH
-from src.api.data_loader.DataLoader import DataLoader
+from src.NER.model import create_ner_model
+from src.api.data_loader.DataLoader import data_loader
 
-from src.api.utils.regenerate_dictionary_files import prepare_dictionary
-# from src.models.NER.model import create_ner_model
 
 
 dirname = dirname(dirname(abspath(__file__)))
-load_dotenv()
 
 
 app = FastAPI()
 
-# os.environ['MLFLOW_S3_ENDPOINT_URL'] = os.getenv('MLFLOW_S3_ENDPOINT_URL')
 
 
 def simplify_multiple(objects):
@@ -40,22 +33,8 @@ def simplify_multiple(objects):
     return objects
 
 
-def flatten(xss):
-    return [x for xs in xss for x in xs]
-
-
 class Model:
     def __init__(self) -> None:
-        # client = mlflow.tracking.MlflowClient()
-        # models = client.get_registered_model(model_name)
-        # model = next(x for x in models.latest_versions if x.current_stage == 'Staging')
-        # run_id=model.run_id
-
-        # local_dir = os.path.abspath(os.getcwd()) + "/tmp/artifact_downloads"
-        # if not os.path.exists(local_dir): os.makedirs(local_dir)
-
-        # important_names_file = client.download_artifacts(run_id, "important_names.jsonl", local_dir)
-        # rules_file = client.download_artifacts(run_id, "rules.jsonl", local_dir)
         self.model = create_ner_model()
 
     def predict(self, data):
@@ -69,9 +48,6 @@ class Model:
                 "year": None if pd.isna(doc.user_data['years']) else doc.user_data['years'],
             }])
         return  result
-
-
-
 
 
 @app.post("/invacation")
@@ -92,8 +68,8 @@ async def create_upload_file(file: UploadFile):
 @app.get("/generate_dictionary")
 async def generate_dictionary():
     # try:
-    data_loader = DataLoader()
     data_loader.needUpdate = True
+
 
     # print(data_loader.dictionary)
 

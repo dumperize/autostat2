@@ -14,13 +14,6 @@ def replace_rus_to_eng_char(sample_string):
                        'Р': 'P',
                        'Т': 'T',
                        'Х': 'X',
-                    #    'а': 'a',
-                    #    'с': 'c',
-                    #    'е': 'e',
-                    #    'к': 'k',
-                    #    'о': 'o',
-                    #    'р': 'p',
-                    #    'х': 'x',
                        }
     return sample_string.translate(str.maketrans(char_to_replace))
 

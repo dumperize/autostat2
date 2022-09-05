@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  app:
+    image: autostat_app
+    container_name: autostat_app
+    ports:
+      - "8003:8003"
+    networks:
+      - web
+    volumes:
+      - ./data:/code/data
+
+networks:
+  web:

@@ -1,10 +1,11 @@
 from spacy.language import Language
 import re
 import numpy as np
-from src.models.NER.ent_year import set_ent_year, currentYearReg
-from src.models.NER.ent_brand_leven import set_similar_model, set_similar_brand
-from src.models.NER.utils.add_del_span import del_span_in_doc
-from src.models.NER.utils.operation import filter_ent
+from src.api.data_loader.DataLoader import data_loader
+from src.NER.ent_year import set_ent_year
+from src.NER.ent_brand_leven import set_similar_model, set_similar_brand
+from src.NER.utils.add_del_span import del_span_in_doc
+from src.NER.utils.operation import filter_ent
 
 
 
@@ -47,7 +48,8 @@ def expand_model(doc):
         ent_models = filter_ent(doc, 'MODEL')
         ent_years = filter_ent(doc, 'YEAR')
 
-        name_years_set = list(set([re.search(r'{}'.format(currentYearReg), x.text).group() for x in ent_years]))
+        current_year_reg = data_loader.get_year_regular()
+        name_years_set = list(set([re.search(r'{}'.format(current_year_reg), x.text).group() for x in ent_years]))
 
         doc.user_data['brands'] = ', '.join(set(get_ents_id(ent_brands))) if len(ent_brands) else np.nan
         doc.user_data['models'] = ', '.join(set(get_ents_id(ent_models))) if len(ent_models) else np.nan
