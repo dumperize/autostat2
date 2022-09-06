@@ -1,7 +1,7 @@
 from http.client import HTTPException
 import os
 import pandas as pd
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from os.path import dirname, abspath
@@ -9,13 +9,9 @@ from src.NER.model import create_ner_model
 from src.api.data_loader.DataLoader import data_loader
 
 
-
 dirname = dirname(dirname(abspath(__file__)))
 
-
 app = FastAPI()
-
-
 
 def simplify_multiple(objects):
     for obj in objects:
@@ -49,8 +45,14 @@ class Model:
             }])
         return  result
 
+@app.get("/generate_dictionary")
+async def generate_dictionary():
+    data_loader.needUpdate = True
 
-@app.post("/invacation")
+    return JSONResponse(content={"succes": True})
+
+
+@app.post("/invacation_file")
 async def create_upload_file(file: UploadFile):
     if file.filename.endswith(".csv"):
         with open(file.filename, "wb") as f:
@@ -65,19 +67,17 @@ async def create_upload_file(file: UploadFile):
         raise HTTPException(status_code=400, detail="invalid file format")
 
 
-@app.get("/generate_dictionary")
-async def generate_dictionary():
-    # try:
-    data_loader.needUpdate = True
 
+@app.post("/invacation")
+async def update_item(request: Request):
+    try: 
+        data_json = await request.json()
+        model = Model()
+        data = pd.json_normalize(data_json)
 
-    # print(data_loader.dictionary)
+        json_compatible_item_data = jsonable_encoder(model.predict(data))
+        return JSONResponse(content=json_compatible_item_data)
+    except:
+        raise HTTPException(status_code=400, detail="Error") 
 
-    return JSONResponse(content={"succes": True})
-
-
-# except:
-#     raise HTTPException(status_code=400, detail="Error")
-
-# if os.getenv('AWS_ACCESS_KEY_ID') is None or os.getenv('AWS_SECRET_ACCESS_KEY') is None:
-#     exit(1)
+    

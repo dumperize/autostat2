@@ -8,6 +8,9 @@ services:
       - "8003:8003"
     networks:
       - web
+    build:
+      context: .
+      dockerfile: Docker/autostat_app/Dockerfile
     volumes:
       - ./data:/code/data
 
