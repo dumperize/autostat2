@@ -53,9 +53,10 @@ class DataLoader(object):
                 "id": brand,
                 "names": generate_name(brand, " | ".join(brand_names)),
                 "models": {
-                    str(row["model"]): {
+                    row["model"]: {
                         "id": row["model"],
                         "names": generate_name(row["model"], row["model_names"]),
+                        "sql_id": row["id"]
                     }
                     for index, row in df_brand.iterrows()
                 },

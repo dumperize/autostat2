@@ -78,7 +78,7 @@ def set_most_likely_model(ent, doc):
                 most_likely_brand = word
                 best_index_token = index
     if max_rate > 0.0:
-        new_ent = Span(doc, best_index_token, best_index_token + 1, label="MODEL", kb_id=most_likely_brand)
+        new_ent = Span(doc, best_index_token, best_index_token + 1, label="MODEL", kb_id=brand + '_' + most_likely_brand)
         doc.set_ents(list(doc.ents) + [new_ent])
 
 
